@@ -20,12 +20,12 @@ WEIGHTS = { EMPTY:0, PAWN:1, BISHOP:3, KNIGHT:3, ROOK:5, QUEEN:8, KING:20 }
 COLOR = { NONE:"*none*", BLACK:"BLACK", WHITE:"WHITE" }
 
 # colors
-colW = '\033[93m'      # oranage
+colW = '\033[93m'      # orange
 colB = '\033[96m'      # blue
-colE = '\033[35m'      # dark something?
+colE = '\033[35m'      # dark purplish?
 colERR = '\033[91m'    # red-ish
-colINFO = '\033[94m'    # purple
-colCLEAR = '\033[39m'
+colINFO = '\033[94m'   # purple
+colCLEAR = '\033[39m'  # reset terminal colors
 
 # Helper methods
 def error(msg):
@@ -65,7 +65,6 @@ class Piece:
         return col + self.piece + ' '
 
 class Move:
-    valid = False
     def __init__(self,p0,r0,f0,p1,r1,f1):
         self.p0 = p0
         self.r0 = r0
@@ -127,6 +126,7 @@ class Board:
         if m[0] == m[1]:
             return error("Starting and ending positions are the same")
 
+        # convert to file and rank coordinates
         f0 = ord(m[0][0])-ord('a')
         r0 = int(m[0][1])-1
 
@@ -137,14 +137,15 @@ class Board:
         if self.board[r0][f0].color != WHITE:
             return error("Must select your own piece to move")
 
+        # trying to move to square occupied by self?
         if self.board[r1][f1].color == WHITE:
-            return error("Destination square occupied") # occupied by self
+            return error("Destination square occupied")
 
         return Move(self.board[r0][f1].piece,r0,f0,self.board[r1][f1].piece,r1,f1)
         
     def square_attacked_by(self, color, r1, f1):
         # for each piece of 'color', is moving to r1,f1 valid?
-        # if so, then it's under attack
+        # if so, then it's considered under attack
         for r in range(5):
             for f in range(5):
                 if self.board[r][f].color == color:
@@ -262,7 +263,7 @@ class Board:
                     method = getattr(self,method_name,lambda x, y: [])
                     moves += method(r,f)
         moves = list(filter(lambda x: True if x[0] == True else False, moves))
-        print(moves)
+#        print(moves)
 
         if len(moves) == 0:
             error("No valid moves! Checkmate??")
@@ -272,8 +273,8 @@ class Board:
         moves = sorted(moves,key=lambda m: m[1].score(),reverse=True)
         for m in moves:
             if self.try_move_piece(m[1],BLACK):
-                print("Best move is: ",end='')
-                print(m[1])
+#                print("Best move is: ",end='')
+#                print(m[1])
                 return m[1]
         return None
     
